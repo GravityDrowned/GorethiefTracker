@@ -26,14 +26,15 @@ GTC.Interface = GTC.Interface or {}
 -- CONSTANTS
 --------------------------------------------------------------------------------
 
---- Texture path for the display icon (Gorethief set icon)
-local TEXTURE_PATH = "/esoui/art/icons/gear_gorethief_chest_a.dds"
+--- Texture path for the display icon (using ESO built-in icon)
+-- Using a generic buff icon since Gorethief specific icon path may vary
+local TEXTURE_PATH = "/esoui/art/icons/ability_armor_009.dds"
 
---- Fallback texture
-local FALLBACK_TEXTURE = "/esoui/art/icons/achievement_update_32.dds"
+--- Fallback texture (same as primary for simplicity)
+local FALLBACK_TEXTURE = "/esoui/art/icons/ability_armor_009.dds"
 
 --- Font for the stack count label
-local STACK_FONT = "ZoFontWinH4"
+local STACK_FONT = "ZoFontWinH2"  -- Larger heading font
 
 --- Color definitions for different stack levels
 -- Each entry is {red, green, blue, alpha}
@@ -259,20 +260,15 @@ end
 -- @return table Color as {r, g, b, a}
 function GTC.Interface.GetColorForStacks(stacks)
     if stacks == 10 then
-        -- 10 stacks - max/proc
-        return {1, 0.84, 0, 1}  -- Gold
+        return {1, 0.84, 0, 1}  -- Gold (max stacks)
     elseif stacks >= 7 then
-        -- 7-9 stacks - very close to proc
-        return COLORS.HIGH  -- Red
+        return {1, 0, 0, 1}     -- Red (7-9 stacks)
     elseif stacks >= 4 then
-        -- 4-6 stacks - getting close
-        return COLORS.MEDIUM  -- Yellow
+        return {1, 1, 0, 1}     -- Yellow (4-6 stacks)
     elseif stacks >= 1 then
-        -- 1-3 stacks - building
-        return COLORS.LOW  -- Green
+        return {0, 1, 0, 1}     -- Green (1-3 stacks)
     else
-        -- Zero stacks - use default
-        return COLORS.DEFAULT  -- White
+        return {1, 1, 1, 1}     -- White (0 stacks)
     end
 end
 
