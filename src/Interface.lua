@@ -87,18 +87,8 @@ function GTC.Interface.Initialize()
     -- Note: SetTexture will silently fail if file doesn't exist
     GTC.texture:SetTexture(TEXTURE_PATH)
     
-    -- Create circular backdrop to mask the texture
-    GTC.backdrop = WINDOW_MANAGER:CreateControl("GTC_Backdrop", GTC.container, CT_BACKDROP)
-    GTC.backdrop:SetAnchor(TOPLEFT, GTC.container, TOPLEFT, 0, 0)
-    GTC.backdrop:SetDimensions(GTC.variables.size, GTC.variables.size)
-    GTC.backdrop:SetCenterColor(0, 0, 0, 0)
-    GTC.backdrop:SetEdgeColor(0, 0, 0, 0)
-    GTC.backdrop:SetEdgeTexture("", 0, 0, 0)
-    GTC.backdrop:SetDrawLevel(0)  -- Behind texture
-    
-    -- Make texture use circular alpha mask
-    GTC.texture:SetBlendMode(TEX_BLEND_MODE_ALPHA)
-    GTC.texture:SetTextureCoords(0.1, 0.9, 0.1, 0.9)  -- Crop edges for circular appearance
+    -- Make texture appear more circular by cropping edges
+    GTC.texture:SetTextureCoords(0.1, 0.9, 0.1, 0.9)
     
     -- Create the circular cooldown overlay
     -- This provides the "pie slice" cooldown animation like ability icons
@@ -350,10 +340,9 @@ function GTC.Interface.SetSize(newSize)
     -- Update SavedVariables
     GTC.variables.size = newSize
     
-    -- Resize container, texture, backdrop, and cooldown overlay
+    -- Resize container, texture, and cooldown overlay
     GTC.container:SetDimensions(newSize, newSize)
     GTC.texture:SetDimensions(newSize, newSize)
-    GTC.backdrop:SetDimensions(newSize, newSize)
     GTC.cooldown:SetDimensions(newSize, newSize)
     
     if GTC.variables.debugMode then
