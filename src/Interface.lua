@@ -87,6 +87,19 @@ function GTC.Interface.Initialize()
     -- Note: SetTexture will silently fail if file doesn't exist
     GTC.texture:SetTexture(TEXTURE_PATH)
     
+    -- Create circular backdrop to mask the texture
+    GTC.backdrop = WINDOW_MANAGER:CreateControl("GTC_Backdrop", GTC.container, CT_BACKDROP)
+    GTC.backdrop:SetAnchor(TOPLEFT, GTC.container, TOPLEFT, 0, 0)
+    GTC.backdrop:SetDimensions(GTC.variables.size, GTC.variables.size)
+    GTC.backdrop:SetCenterColor(0, 0, 0, 0)
+    GTC.backdrop:SetEdgeColor(0, 0, 0, 0)
+    GTC.backdrop:SetEdgeTexture("", 0, 0, 0)
+    GTC.backdrop:SetDrawLevel(0)  -- Behind texture
+    
+    -- Make texture use circular alpha mask
+    GTC.texture:SetBlendMode(TEX_BLEND_MODE_ALPHA)
+    GTC.texture:SetTextureCoords(0.1, 0.9, 0.1, 0.9)  -- Crop edges for circular appearance
+    
     -- Create the circular cooldown overlay
     -- This provides the "pie slice" cooldown animation like ability icons
     GTC.cooldown = WINDOW_MANAGER:CreateControl("GTC_Cooldown", GTC.container, CT_COOLDOWN)
@@ -208,7 +221,7 @@ function GTC.Interface.UpdateUI()
             )
             
             -- Dim the icon texture during cooldown
-            GTC.texture:SetColor(0.4, 0.4, 0.4, 1)
+            GTC.texture:SetColor(0.4, 0.4, 0.4, 0.3)  -- More transparent during cooldown
             
             -- Show cooldown time as text with better precision
             local seconds = cooldownRemaining / 1000
@@ -252,21 +265,19 @@ end
 
 --- Gets the appropriate color for a given stack count
 -- Color coding provides at-a-glance status:
--- - Green (1-3): Building stacks
--- - Yellow (4-7): Getting close
--- - Red (8-10): Proc imminent!
+-- - Green (1-5): Building stacks
+-- - Yellow (6-9): Getting close
+-- - Red (10): Max stacks - ready to bash!
 --
 -- @param stacks number Current stack count (0-10)
 -- @return table Color as {r, g, b, a}
 function GTC.Interface.GetColorForStacks(stacks)
-    if stacks == 10 then
-        return {1, 0.84, 0, 1}  -- Gold (max stacks)
-    elseif stacks >= 7 then
-        return {1, 0, 0, 1}     -- Red (7-9 stacks)
-    elseif stacks >= 4 then
-        return {1, 1, 0, 1}     -- Yellow (4-6 stacks)
+    if stacks >= 10 then
+        return {1, 0, 0, 1}     -- Red (max stacks - ready to bash!)
+    elseif stacks >= 6 then
+        return {1, 1, 0, 1}     -- Yellow (6-9 stacks)
     elseif stacks >= 1 then
-        return {0, 1, 0, 1}     -- Green (1-3 stacks)
+        return {0, 1, 0, 1}     -- Green (1-5 stacks)
     else
         return {1, 1, 1, 1}     -- White (0 stacks)
     end
@@ -339,9 +350,10 @@ function GTC.Interface.SetSize(newSize)
     -- Update SavedVariables
     GTC.variables.size = newSize
     
-    -- Resize container, texture, and cooldown overlay
+    -- Resize container, texture, backdrop, and cooldown overlay
     GTC.container:SetDimensions(newSize, newSize)
     GTC.texture:SetDimensions(newSize, newSize)
+    GTC.backdrop:SetDimensions(newSize, newSize)
     GTC.cooldown:SetDimensions(newSize, newSize)
     
     if GTC.variables.debugMode then
